@@ -18,14 +18,14 @@ PODS:
   - TomTomOnlineUtils (2.4.143)
 
 DEPENDENCIES:
-  - TomTomOnlineSDKGeofencing (= 2.4.143)
-  - TomTomOnlineSDKMaps (= 2.4.143)
-  - TomTomOnlineSDKMapsDriving (= 2.4.143)
-  - TomTomOnlineSDKMapsStaticImage (= 2.4.143)
-  - TomTomOnlineSDKMapsUIExtensions (= 2.4.143)
-  - TomTomOnlineSDKRouting (= 2.4.143)
-  - TomTomOnlineSDKSearch (= 2.4.143)
-  - TomTomOnlineSDKTraffic (= 2.4.143)
+  - TomTomOnlineSDKGeofencing
+  - TomTomOnlineSDKMaps
+  - TomTomOnlineSDKMapsDriving
+  - TomTomOnlineSDKMapsStaticImage
+  - TomTomOnlineSDKMapsUIExtensions
+  - TomTomOnlineSDKRouting
+  - TomTomOnlineSDKSearch
+  - TomTomOnlineSDKTraffic
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -50,6 +50,6 @@ SPEC CHECKSUMS:
   TomTomOnlineSDKTraffic: 2a757f29bcf52a418b9da8b6a6f6c7c5754ea162
   TomTomOnlineUtils: 13bc6ab25d3257bbe457eff71dac8e7f5bb82076
 
-PODFILE CHECKSUM: ace616b1a513655026795f2b4afba0d57f08d208
+PODFILE CHECKSUM: c905453137ca8293d26299d486f95ed75d709a60
 
 COCOAPODS: 1.6.1
