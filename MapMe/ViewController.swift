@@ -32,6 +32,7 @@ class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDele
     }
     
     func initTomTomService(){
+        tomtomMap.isShowsUserLocation = true
         tomtomMap.delegate = self
         tomtomMap.annotationManager.delegate = self
         alongRouteSearch.delegate = self
@@ -82,6 +83,10 @@ class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDele
             address = freeFormAddress
         }
         processGeocodeResponse(firstAddress.position, address)
+    }
+    
+    func reverseGeocoder(_ reverseGeocoder: TTReverseGeocoder, failedWithError error: TTResponseError) {
+        print(error.userInfo)
     }
     
     func processGeocodeResponse(_ geocodePosition: CLLocationCoordinate2D, _ address:String){
