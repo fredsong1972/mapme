@@ -58,7 +58,7 @@ class ViewController: UIViewController, TTMapViewDelegate, TTAnnotationDelegate,
     func isDeparturePositionSet()->Bool{
         return CLLocationCoordinate2DIsValid(self.departurePosition)
     }
-    
+    // TTMapViewDelegate
     func mapView(_ mapView: TTMapView, didLongPress coordinate: CLLocationCoordinate2D){
         if (self.isDeparturePositionSet() && self.isDestinationPositionSet()){
             self.clearMap()
@@ -72,10 +72,42 @@ class ViewController: UIViewController, TTMapViewDelegate, TTAnnotationDelegate,
         self.reverseGeocoder.reverseGeocoder(with: query)
     }
     
-    func processGeocodeResponse(_ geocodePosition: CLLocationCoordinate2D, _ address: NSString){
+    // TTReverseGeocoderDelegate
+    func reverseGeocoder(_ reverseGeocoder: TTReverseGeocoder, completedWith response: TTReverseGeocoderResponse) {
+        var address = " "
+        guard let firstAddress = response.result.addresses.first else { return }
+        if let freeFormAddress = firstAddress.address.freeformAddress{
+            address = freeFormAddress
+        }
+        self.processGeocodeResponse(firstAddress.position, address)
+    }
+    
+    func processGeocodeResponse(_ geocodePosition: CLLocationCoordinate2D, _ address:String){
         if (!CLLocationCoordinate2DIsValid(self.departurePosition)){
             self.departurePosition = geocodePosition
-         }
+            self.createAndDisplayMarkerAtPosition(self.departurePosition, withAnnotationImage: self.departureImage, andBalloonText: address)
+        } else {
+            self.destinationPosition = geocodePosition
+            self.drawRouteWithDeparture(departure: self.departurePosition, andDestination: self.destinationPosition)
+        }
+        
+    }
+    
+    func drawRouteWithDeparture(departure: CLLocationCoordinate2D, andDestination destination: CLLocationCoordinate2D){
+        self.drawRouteWithDeparture(departure: departure, andDestination: destination, andWayPoint: kCLLocationCoordinate2DInvalid)
+    }
+    
+    func drawRouteWithDeparture(departure: CLLocationCoordinate2D, andDestination destination: CLLocationCoordinate2D, andWayPoint wayPoint :CLLocationCoordinate2D) {
+        let query = self.createRouteQueryWithOrigin(origin:departure, andDestination:destination, andWayPoint:wayPoint)
+        self.route.plan(with: query)
+    }
+    
+    //TTRouteResponseDelegate
+    func route(_ route: TTRoute, completedWith result: TTRouteResult) {
+        guard let plannedRoute = result.routes.first else {
+            return
+        }
+        self.addActiveRouteToMap(route: plannedRoute)
     }
     
     func createRouteQueryWithOrigin(origin:CLLocationCoordinate2D, andDestination destination:CLLocationCoordinate2D, andWayPoint wayPoint:CLLocationCoordinate2D)->TTRouteQuery {
@@ -101,10 +133,9 @@ class ViewController: UIViewController, TTMapViewDelegate, TTAnnotationDelegate,
         self.tomtomMap.routeManager.bring(toFrontRoute: mapRoute)
     }
     
-    func createAndDisplayMarkerAtPosition(_ coords:CLLocationCoordinate2D, withAnnotationImage image:TTAnnotationImage, ndBalloonText text: NSString) {
+    func createAndDisplayMarkerAtPosition(_ coords:CLLocationCoordinate2D, withAnnotationImage image:TTAnnotationImage, andBalloonText text: String) {
         self.positionsPoisInfo[coords] = text
         self.tomtomMap.annotationManager.add(TTAnnotation.init(coordinate: coords, annotationImage: image, anchor: .center, type: TTAnnotationType.focal))
     }
-    
     
 }
