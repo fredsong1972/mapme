@@ -12,7 +12,7 @@ import TomTomOnlineSDKSearch
 import TomTomOnlineSDKRouting
 import TomTomOnlineSDKMapsUIExtensions
 
-class ViewController: UIViewController, TTMapViewDelegate, TTAnnotationDelegate, TTAlongRouteSearchDelegate {
+class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDelegate, TTRouteResponseDelegate, TTAnnotationDelegate, TTAlongRouteSearchDelegate {
     @IBOutlet weak var tomtomMap: TTMapView!
     let route = TTRoute()
     let reverseGeocoder = TTReverseGeocoder()
@@ -27,28 +27,30 @@ class ViewController: UIViewController, TTMapViewDelegate, TTAnnotationDelegate,
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        self.initTomTomService()
-        self.initUIViews()
+        initTomTomService()
+        initUIViews()
     }
     
     func initTomTomService(){
-        self.tomtomMap.delegate = self
-        self.tomtomMap.annotationManager.delegate = self
-        self.alongRouteSearch.delegate = self
+        tomtomMap.delegate = self
+        tomtomMap.annotationManager.delegate = self
+        alongRouteSearch.delegate = self
+        reverseGeocoder.delegate = self
+        route.delegate = self
     }
     
     func initUIViews(){
-        self.departureImage = TTAnnotationImage.createPNG(withName: "ic_map_route_departure")
+        departureImage = TTAnnotationImage.createPNG(withName: "ic_map_route_departure")
         
     }
     
     func clearMap(){
-        self.tomtomMap.routeManager.removeAllRoutes()
-        self.tomtomMap.annotationManager.removeAllAnnotations()
-        self.departurePosition = kCLLocationCoordinate2DInvalid
-        self.destinationPosition = kCLLocationCoordinate2DInvalid
-        self.wayPointPosition = kCLLocationCoordinate2DInvalid
-        self.fullRoute = nil
+        tomtomMap.routeManager.removeAllRoutes()
+        tomtomMap.annotationManager.removeAllAnnotations()
+        departurePosition = kCLLocationCoordinate2DInvalid
+        destinationPosition = kCLLocationCoordinate2DInvalid
+        wayPointPosition = kCLLocationCoordinate2DInvalid
+        fullRoute = nil
     }
     
     func isDestinationPositionSet ()->Bool{
@@ -60,16 +62,16 @@ class ViewController: UIViewController, TTMapViewDelegate, TTAnnotationDelegate,
     }
     // TTMapViewDelegate
     func mapView(_ mapView: TTMapView, didLongPress coordinate: CLLocationCoordinate2D){
-        if (self.isDeparturePositionSet() && self.isDestinationPositionSet()){
-            self.clearMap()
+        if (isDeparturePositionSet() && isDestinationPositionSet()){
+            clearMap()
         }else{
-            self.handleLongPress(coordinate)
+            handleLongPress(coordinate)
         }
     }
     
     func handleLongPress(_ coordinate:CLLocationCoordinate2D){
         let query = TTReverseGeocoderQueryBuilder.create(with: coordinate).build()
-        self.reverseGeocoder.reverseGeocoder(with: query)
+        reverseGeocoder.reverseGeocoder(with: query)
     }
     
     // TTReverseGeocoderDelegate
@@ -79,27 +81,27 @@ class ViewController: UIViewController, TTMapViewDelegate, TTAnnotationDelegate,
         if let freeFormAddress = firstAddress.address.freeformAddress{
             address = freeFormAddress
         }
-        self.processGeocodeResponse(firstAddress.position, address)
+        processGeocodeResponse(firstAddress.position, address)
     }
     
     func processGeocodeResponse(_ geocodePosition: CLLocationCoordinate2D, _ address:String){
-        if (!CLLocationCoordinate2DIsValid(self.departurePosition)){
-            self.departurePosition = geocodePosition
-            self.createAndDisplayMarkerAtPosition(self.departurePosition, withAnnotationImage: self.departureImage, andBalloonText: address)
+        if (!CLLocationCoordinate2DIsValid(departurePosition)){
+            departurePosition = geocodePosition
+            createAndDisplayMarkerAtPosition(departurePosition, withAnnotationImage: departureImage, andBalloonText: address)
         } else {
-            self.destinationPosition = geocodePosition
-            self.drawRouteWithDeparture(departure: self.departurePosition, andDestination: self.destinationPosition)
+            destinationPosition = geocodePosition
+            drawRouteWithDeparture(departure: departurePosition, andDestination: destinationPosition)
         }
         
     }
     
     func drawRouteWithDeparture(departure: CLLocationCoordinate2D, andDestination destination: CLLocationCoordinate2D){
-        self.drawRouteWithDeparture(departure: departure, andDestination: destination, andWayPoint: kCLLocationCoordinate2DInvalid)
+        drawRouteWithDeparture(departure: departure, andDestination: destination, andWayPoint: kCLLocationCoordinate2DInvalid)
     }
     
     func drawRouteWithDeparture(departure: CLLocationCoordinate2D, andDestination destination: CLLocationCoordinate2D, andWayPoint wayPoint :CLLocationCoordinate2D) {
-        let query = self.createRouteQueryWithOrigin(origin:departure, andDestination:destination, andWayPoint:wayPoint)
-        self.route.plan(with: query)
+        let query = createRouteQueryWithOrigin(origin:departure, andDestination:destination, andWayPoint:wayPoint)
+        route.plan(with: query)
     }
     
     //TTRouteResponseDelegate
@@ -107,9 +109,12 @@ class ViewController: UIViewController, TTMapViewDelegate, TTAnnotationDelegate,
         guard let plannedRoute = result.routes.first else {
             return
         }
-        self.addActiveRouteToMap(route: plannedRoute)
+        addActiveRouteToMap(route: plannedRoute)
     }
     
+    func route(_ route: TTRoute, completedWith responseError: TTResponseError) {
+      print(responseError.userInfo)
+    }
     func createRouteQueryWithOrigin(origin:CLLocationCoordinate2D, andDestination destination:CLLocationCoordinate2D, andWayPoint wayPoint:CLLocationCoordinate2D)->TTRouteQuery {
         let builder = TTRouteQueryBuilder.create(withDest: destination, andOrig: origin)
         if (CLLocationCoordinate2DIsValid(wayPoint)) {
@@ -120,22 +125,22 @@ class ViewController: UIViewController, TTMapViewDelegate, TTAnnotationDelegate,
     }
     
     func addActiveRouteToMap(route:TTFullRoute) {
-        self.tomtomMap.routeManager.removeAllRoutes()
-        self.fullRoute = route
-        if (!CLLocationCoordinate2DIsValid(self.wayPointPosition)) {
-            self.tomtomMap.annotationManager.removeAllAnnotations()
+        tomtomMap.routeManager.removeAllRoutes()
+        fullRoute = route
+        if (!CLLocationCoordinate2DIsValid(wayPointPosition)) {
+            tomtomMap.annotationManager.removeAllAnnotations()
         }
-        let mapRoute = TTMapRoute(coordinatesData: self.fullRoute,
+        let mapRoute = TTMapRoute(coordinatesData: fullRoute,
                                   with: TTMapRouteStyle.defaultActive(),
                                   imageStart: TTMapRoute.defaultImageDeparture(),
                                   imageEnd: TTMapRoute.defaultImageDestination())
-        self.tomtomMap.routeManager.add(mapRoute)
-        self.tomtomMap.routeManager.bring(toFrontRoute: mapRoute)
+        tomtomMap.routeManager.add(mapRoute)
+        tomtomMap.routeManager.bring(toFrontRoute: mapRoute)
     }
     
     func createAndDisplayMarkerAtPosition(_ coords:CLLocationCoordinate2D, withAnnotationImage image:TTAnnotationImage, andBalloonText text: String) {
-        self.positionsPoisInfo[coords] = text
-        self.tomtomMap.annotationManager.add(TTAnnotation.init(coordinate: coords, annotationImage: image, anchor: .center, type: TTAnnotationType.focal))
+        positionsPoisInfo[coords] = text
+        tomtomMap.annotationManager.add(TTAnnotation.init(coordinate: coords, annotationImage: image, anchor: .center, type: TTAnnotationType.focal))
     }
     
 }
