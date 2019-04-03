@@ -13,7 +13,7 @@ import TomTomOnlineSDKRouting
 import TomTomOnlineSDKMapsUIExtensions
 
 
-class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDelegate, TTRouteResponseDelegate, TTAnnotationDelegate, TTAlongRouteSearchDelegate {
+class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDelegate, TTRouteResponseDelegate, TTAnnotationDelegate, TTAlongRouteSearchDelegate, OptionsViewDelegate {
     @IBOutlet weak var tomtomMap: TTMapView!
     let route = TTRoute()
     let reverseGeocoder = TTReverseGeocoder()
@@ -24,6 +24,7 @@ class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDele
     var wayPointPosition = kCLLocationCoordinate2DInvalid
     var departureImage: TTAnnotationImage!
     let positionsPoisInfo = NSMutableDictionary.init()
+    let mapOptionsView = OptionsView(labels: ["Basic", "Custom"], selectedID: 0)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,9 +47,16 @@ class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDele
     
     func initUIViews(){
         departureImage = TTAnnotationImage.createPNG(withName: "ic_map_route_departure")
+        mapOptionsView.delegate = self
+        view.addSubview(mapOptionsView)
+        mapOptionsView.translatesAutoresizingMaskIntoConstraints = false
+        mapOptionsView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20).isActive = true
+        mapOptionsView.heightAnchor.constraint(equalToConstant:36).isActive = true
+        view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-20-[v0]-20-|", options: [], metrics: nil, views: ["v0": mapOptionsView]))
     }
     
     func onMapReady(){
+        tomtomMap.isShowsUserLocation = true
         print("Map Ready")
     }
     
@@ -155,4 +163,21 @@ class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDele
         tomtomMap.annotationManager.add(TTAnnotation.init(coordinate: coords, annotationImage: image, anchor: .center, type: TTAnnotationType.focal))
     }
     
-}
+    //OptionsViewDelegate
+    func displayMap(ID: Int, on: Bool){
+        switch ID {
+        case 1:
+            displayStyleCustom()
+        default:
+            displayStyleBasic()
+        }
+    }
+    
+    func displayStyleBasic() {
+        tomtomMap.setStylePath(nil)
+    }
+    
+    func displayStyleCustom() {
+        let customStyle = Bundle.main.path(forResource: "style", ofType: "json")
+        tomtomMap.setStylePath(customStyle)
+    }}
