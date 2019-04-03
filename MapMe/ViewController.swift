@@ -35,6 +35,7 @@ class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDele
     func initTomTomService(){
         tomtomMap.delegate = self
         tomtomMap.annotationManager.delegate = self
+        tomtomMap.center(on: TTCoordinate.MELBOURNE(), withZoom: 10)
         tomtomMap.onMapReadyCompletion {
             self.onMapReady()
         }
@@ -48,7 +49,7 @@ class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDele
     }
     
     func onMapReady(){
-        TTLocation.
+        print("Map Ready")
     }
     
     func clearMap(){
