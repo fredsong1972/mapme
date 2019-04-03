@@ -12,6 +12,7 @@ import TomTomOnlineSDKSearch
 import TomTomOnlineSDKRouting
 import TomTomOnlineSDKMapsUIExtensions
 
+
 class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDelegate, TTRouteResponseDelegate, TTAnnotationDelegate, TTAlongRouteSearchDelegate {
     @IBOutlet weak var tomtomMap: TTMapView!
     let route = TTRoute()
@@ -32,9 +33,11 @@ class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDele
     }
     
     func initTomTomService(){
-        tomtomMap.isShowsUserLocation = true
         tomtomMap.delegate = self
         tomtomMap.annotationManager.delegate = self
+        tomtomMap.onMapReadyCompletion {
+            self.onMapReady()
+        }
         alongRouteSearch.delegate = self
         reverseGeocoder.delegate = self
         route.delegate = self
@@ -42,7 +45,10 @@ class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDele
     
     func initUIViews(){
         departureImage = TTAnnotationImage.createPNG(withName: "ic_map_route_departure")
-        
+    }
+    
+    func onMapReady(){
+        TTLocation.
     }
     
     func clearMap(){
