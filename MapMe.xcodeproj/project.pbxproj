@@ -16,7 +16,6 @@
 		8E69B0C52254D19000F7F48A /* OptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E69B0C42254D19000F7F48A /* OptionsView.swift */; };
 		8E69B0C72254DB1D00F7F48A /* style.json in Resources */ = {isa = PBXBuildFile; fileRef = 8E69B0C62254DB1D00F7F48A /* style.json */; };
 		8ECC889B225485FA00BD5C9A /* TTConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECC889A225485FA00BD5C9A /* TTConstants.swift */; };
-		8EEEB6262255C7600000C7BE /* PolygonAdditionalDataVisitior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EEEB6252255C7600000C7BE /* PolygonAdditionalDataVisitior.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,7 +31,6 @@
 		8E69B0C42254D19000F7F48A /* OptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsView.swift; sourceTree = "<group>"; };
 		8E69B0C62254DB1D00F7F48A /* style.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = style.json; sourceTree = "<group>"; };
 		8ECC889A225485FA00BD5C9A /* TTConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTConstants.swift; sourceTree = "<group>"; };
-		8EEEB6252255C7600000C7BE /* PolygonAdditionalDataVisitior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolygonAdditionalDataVisitior.swift; sourceTree = "<group>"; };
 		E5092BACE67A14552A77EE28 /* libPods-MapMe.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MapMe.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -86,7 +84,6 @@
 				8ECC889A225485FA00BD5C9A /* TTConstants.swift */,
 				8E69B0C42254D19000F7F48A /* OptionsView.swift */,
 				8E69B0C62254DB1D00F7F48A /* style.json */,
-				8EEEB6252255C7600000C7BE /* PolygonAdditionalDataVisitior.swift */,
 			);
 			path = MapMe;
 			sourceTree = "<group>";
@@ -240,7 +237,6 @@
 				8E574C17224F5B2300F3DE58 /* ViewController.swift in Sources */,
 				8ECC889B225485FA00BD5C9A /* TTConstants.swift in Sources */,
 				8E574C15224F5B2300F3DE58 /* AppDelegate.swift in Sources */,
-				8EEEB6262255C7600000C7BE /* PolygonAdditionalDataVisitior.swift in Sources */,
 				8E69B0C52254D19000F7F48A /* OptionsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
