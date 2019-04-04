@@ -18,18 +18,25 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <searchBar contentMode="redraw" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1lt-YH-axT">
-                                <rect key="frame" x="0.0" y="44" width="414" height="44"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                            <searchBar contentMode="redraw" placeholder="Address" translatesAutoresizingMaskIntoConstraints="NO" id="1lt-YH-axT">
+                                <rect key="frame" x="5" y="49" width="404" height="56"/>
                                 <textInputTraits key="textInputTraits"/>
                             </searchBar>
-                            <view contentMode="scaleToFill" fixedFrame="YES" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="baj-ci-K0w" customClass="TTMapView">
+                            <view contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="baj-ci-K0w" customClass="TTMapView">
                                 <rect key="frame" x="0.0" y="93" width="414" height="786"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="1lt-YH-axT" firstAttribute="centerX" secondItem="baj-ci-K0w" secondAttribute="centerX" id="7cq-oZ-e8a"/>
+                            <constraint firstItem="baj-ci-K0w" firstAttribute="top" secondItem="pJX-ME-cgt" secondAttribute="top" constant="49" id="G3S-OH-pQU"/>
+                            <constraint firstAttribute="trailing" secondItem="baj-ci-K0w" secondAttribute="trailing" id="dl2-gh-lVJ"/>
+                            <constraint firstItem="baj-ci-K0w" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="hvU-Th-eOh"/>
+                            <constraint firstItem="1lt-YH-axT" firstAttribute="leading" secondItem="pJX-ME-cgt" secondAttribute="leading" constant="5" id="mKb-4V-AAc"/>
+                            <constraint firstAttribute="bottomMargin" secondItem="baj-ci-K0w" secondAttribute="bottom" constant="-17" id="saV-EX-EXm"/>
+                            <constraint firstItem="1lt-YH-axT" firstAttribute="top" secondItem="pJX-ME-cgt" secondAttribute="top" constant="5" id="yJ6-8k-iHH"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="pJX-ME-cgt"/>
                     </view>
                     <connections>
