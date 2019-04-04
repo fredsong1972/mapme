@@ -13,11 +13,11 @@ import TomTomOnlineSDKRouting
 import TomTomOnlineSDKMapsUIExtensions
 
 
-class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDelegate, TTRouteResponseDelegate, TTAnnotationDelegate, TTAlongRouteSearchDelegate, OptionsViewDelegate {
+class ViewController: UIViewController, UISearchBarDelegate, TTMapViewDelegate, TTReverseGeocoderDelegate, TTRouteResponseDelegate, TTAnnotationDelegate, TTSearchDelegate, TTAdditionalDataSearchDelegate, OptionsViewDelegate {
     @IBOutlet weak var tomtomMap: TTMapView!
+    @IBOutlet weak var searchBar: UISearchBar!
     let route = TTRoute()
     let reverseGeocoder = TTReverseGeocoder()
-    let alongRouteSearch = TTAlongRouteSearch()
     var fullRoute: TTFullRoute!
     var departurePosition = kCLLocationCoordinate2DInvalid
     var destinationPosition = kCLLocationCoordinate2DInvalid
@@ -25,6 +25,8 @@ class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDele
     var departureImage: TTAnnotationImage!
     let positionsPoisInfo = NSMutableDictionary.init()
     let mapOptionsView = OptionsView(labels: ["Basic", "Custom"], selectedID: 0)
+    let mapSearch = TTSearch()
+    let searchAdditional = TTAdditionalDataSearch()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,9 +42,10 @@ class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDele
         tomtomMap.onMapReadyCompletion {
             self.onMapReady()
         }
-        alongRouteSearch.delegate = self
         reverseGeocoder.delegate = self
         route.delegate = self
+        mapSearch.delegate = self
+        searchAdditional.delegate = self
     }
     
     func initUIViews(){
@@ -53,6 +56,7 @@ class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDele
         mapOptionsView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20).isActive = true
         mapOptionsView.heightAnchor.constraint(equalToConstant:36).isActive = true
         view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-20-[v0]-20-|", options: [], metrics: nil, views: ["v0": mapOptionsView]))
+        searchBar.delegate = self
     }
     
     func onMapReady(){
@@ -180,4 +184,63 @@ class ViewController: UIViewController, TTMapViewDelegate, TTReverseGeocoderDele
     func displayStyleCustom() {
         let customStyle = Bundle.main.path(forResource: "style", ofType: "json")
         tomtomMap.setStylePath(customStyle)
-    }}
+    }
+    
+    //UISearchBar Delegate
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        guard let term = searchBar.text else {
+            return
+        }
+        searchForTerm(term)
+    }
+    
+    func searchForTerm(_ term: String) {
+        let query = TTSearchQueryBuilder.create(withTerm: term).withIdxSet(TTSearchIndex.pointOfInterest)
+            .build()
+        mapSearch.search(with: query)
+    }
+   
+    //MARK: TTSearchDelegate
+    func search(_ search: TTSearch, completedWith response: TTSearchResponse) {
+        guard let result = response.results.first else {
+            return
+        }
+        guard let entryPoints = result.entryPoints else {
+            return
+        }
+        for entryPoint in entryPoints {
+            
+            let annotation = TTAnnotation(coordinate: entryPoint.position,
+                                              annotationImage: TTAnnotationImage.createPNG(withName: "entry_point")!,
+                                              anchor: TTAnnotationAnchor.bottom,
+                                              type: TTAnnotationType.focal)
+            
+            tomtomMap.annotationManager.add(annotation)
+        }
+        tomtomMap.zoomToAllAnnotations()
+    }
+
+    func search(_ search: TTSearch, failedWithError error: TTResponseError) {
+        print(error.userInfo)
+    }
+    
+    //MARK: TTAdditionalDataSearchDelegate
+    func additionalDataSearch(_ additionalDataSearch: TTAdditionalDataSearch, completedWith response: TTAdditionalDataSearchResponse) {
+        guard let result = response.results.first else {
+            return
+        }
+        let visitor = PolygonAdditionalDataVisitior()
+        result.visit(visitor)
+        var mapPolygons: [TTPolygon] = []
+        for lineString in visitor.lineStrings {
+            let mapPolygon = TTPolygon(coordinatesData: lineString, opacity: 0.7, color: TTColor.Red(), colorOutline: TTColor.Red())
+            mapPolygons.append(mapPolygon)
+            tomtomMap.annotationManager.add(mapPolygon)
+        }
+        tomtomMap.zoom(toCoordinatesDataCollection: mapPolygons)
+    }
+    
+    func additionalDataSearch(_ additionalDataSearch: TTAdditionalDataSearch, failedWithError error: TTResponseError) {
+        print(error.userInfo)
+    }
+}
